@@ -1,0 +1,50 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>AI Incident Analyzer</title>
+    <style>
+        body { font-family: Arial, sans-serif; background:#f6f6f6; padding: 20px; }
+        .c { max-width: 900px; margin: 0 auto; background:#fff; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        textarea, input { width:100%; padding:10px; margin:8px 0; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+        button { padding:12px 20px; background: #007bff; color: white; border: none; border-radius: 4px; cursor:pointer; font-weight: bold; }
+        button:hover { background: #0056b3; }
+        pre { background:#111; color:#0f0; padding: 15px; border-radius: 8px; overflow:auto; min-height: 100px; white-space: pre-wrap; }
+        label { font-weight: bold; display: block; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <div class="c">
+        <h1>AI Incident Analyzer</h1>
+        <label>API URL (Backend)</label>
+        <input id="apiUrl" value="http://localhost:3001" />
+        <label>Temperatura (0.2 = Preciso, 0.8 = Creativo)</label>
+        <input id="temp" type="number" min="0" max="1" step="0.1" value="0.2" />
+        <label>Logs / Contexto del Incidente (Anonimizado)</label>
+        <textarea id="text" rows="10" placeholder="Pega aquí los logs..."></textarea>
+        <button id="run">Analizar Incidente</button>
+        <h3>Resultado del Análisis:</h3>
+        <pre id="out">Esperando entrada...</pre>
+    </div>
+    <script>
+        const out = document.getElementById("out");
+        document.getElementById("run").onclick = async () => {
+            out.textContent = "Procesando con IA...";
+            const apiUrl = document.getElementById("apiUrl").value.trim();
+            const temperature = Number(document.getElementById("temp").value);
+            const text = document.getElementById("text").value;
+            try {
+                const r = await fetch(apiUrl + "/ai/analyze", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ text, temperature })
+                });
+                const data = await r.json();
+                out.textContent = JSON.stringify(data, null, 2);
+            } catch (e) {
+                out.textContent = "Error de conexión: " + e.message;
+            }
+        };
+    </script>
+</body>
+</html>
